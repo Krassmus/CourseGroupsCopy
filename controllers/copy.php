@@ -6,7 +6,28 @@ class CopyController extends PluginController
 {
     public function select_course_action()
     {
-
+        $this->search = new SQLSearch(
+            "
+            SELECT seminare.Seminar_id, seminare.Name
+            FROM seminare
+                LEFT JOIN semester_data ON (seminare.start_time = semester_data.beginn OR (seminare.start_time < semester_data.beginn AND (seminare.duration_time = -1 OR seminare.start_time + seminare.duration_time >= semester_data.beginn)))
+                LEFT JOIN seminar_user ON (seminar_user.Seminar_id = seminare.Seminar_id AND seminar_user.status = 'dozent')
+                LEFT JOIN auth_user_md5 ON (auth_user_md5.user_id = seminar_user.user_id) 
+            WHERE (
+                    CONCAT(seminare.VeranstaltungsNummer, ' ', seminare.Name) LIKE :input
+                    OR CONCAT(auth_user_md5.Vorname, ' ', auth_user_md5.Nachname) LIKE :input
+                    OR seminare.Untertitel LIKE :input
+                    OR seminare.Beschreibung LIKE :input 
+                    OR seminare.Ort LIKE :input 
+                    OR seminare.Sonstiges LIKE :input
+                )
+                AND (semester_data.semester_id = :semester_id OR :semester_id = '')
+                AND seminare.status NOT IN ('".implode("', '", studygroup_sem_types())."')
+            GROUP BY seminare.Seminar_id
+            ",
+            _("Veranstaltung suchen"),
+            "Seminar_id"
+        );
     }
 
     public function to_course_action()

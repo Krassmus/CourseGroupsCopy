@@ -3,8 +3,20 @@
       class="default studip_form">
 
     <label>
+        <?= _("Veranstaltung in Semester") ?>
+        <select name="semester_id">
+            <option value=""></option>
+            <? foreach (array_reverse(Semester::getAll()) as $semester) : ?>
+            <option value="<?= htmlReady($semester->getId()) ?>"<?= $semester->getId() == Semester::findCurrent()->getId() ? " selected" : "" ?>>
+                <?= htmlReady($semester['name']) ?>
+            </option>
+            <? endforeach ?>
+        </select>
+    </label>
+
+    <label>
         <?= _("Veranstaltung auswählen") ?>
-        <?= QuickSearch::get("seminar_id", new StandardSearch("Seminar_id"))->render() ?>
+        <?= QuickSearch::get("seminar_id", $search)->render() ?>
     </label>
 
     <h3><?= _("Gruppen") ?></h3>

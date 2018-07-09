@@ -6,13 +6,15 @@ class CourseGroupsCopy extends StudIPPlugin implements SystemPlugin
     public function __construct()
     {
         parent::__construct();
-        $course_id = $_SESSION['SessionSeminar'] ?: Context::get()->id;
-        if (strpos($_SERVER['REQUEST_URI'], 'admin_statusgruppe.php') && $GLOBALS['perm']->have_studip_perm("tutor", $course_id)) {
-            NotificationCenter::addObserver(
-                $this,
-                'addSidebarAction',
-                'SidebarWillRender'
-            );
+        if (strpos($_SERVER['REQUEST_URI'], 'admin_statusgruppe.php')) {
+            $course_id = $_SESSION['SessionSeminar'] ?: Context::get()->id;
+            if ($GLOBALS['perm']->have_studip_perm("tutor", $course_id)) {
+                NotificationCenter::addObserver(
+                    $this,
+                    'addSidebarAction',
+                    'SidebarWillRender'
+                );
+            }
         }
     }
 
